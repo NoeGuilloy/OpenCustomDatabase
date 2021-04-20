@@ -155,7 +155,7 @@ def OpenVar_analysis(vcf_path, expname, scpecie='human'):
     opv.run_snpeff_parallel_pipe()
     opvr = OPVReport(opv)
     out = list()
-    for f in opvr.list_annOnePerLine_files:
+    for f in opvr.annOnePerLine_files:
         out.extend(list(opvr.parse_annOnePerLine(f, as_dict=True)))
     return out    
 
