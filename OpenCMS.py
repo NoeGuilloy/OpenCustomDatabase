@@ -1,6 +1,8 @@
 from OpenCMS.utils import *
 from OpenCMS.SNP_handle import *
-
+OP_protein_fasta = './Databases/OpenProt_DB_Ensemble_1_6.fasta'
+transcrit_fasta = './Databases/gencode.v29.transcripts.fa'
+OP_tsv = './Databases/human-openprot-r1_6-refprots+altprots+isoforms-+uniprot2019_03_01.tsv'
 
 class OpenCMS:
     def __init__(self, 
@@ -17,12 +19,15 @@ class OpenCMS:
 
     def run(self, verbose=True):
         if verbose:
-            print('running snpeff...')
+            print('running Openvar...')
         parsed_snpeff = OpenVar_analysis(self.vcf_path, self.expname)
-        prot_syno = get_synonyms_prot(protein_fasta)
-        start_codon = get_start_codon(tsv, transcrit_fasta)
-        fasta_dict = get_fasta_dict(protein_fasta)
+        print('Parsing...')
         protvariantfile = get_protvcf_file(parsenpff,expname)
+        print('..Done')
+        print('calculs...')
+        prot_syno = get_synonyms_prot(OP_protein_fasta)
+        start_codon = get_start_codon(OP_tsv, transcrit_fasta)
+        fasta_dict = get_fasta_dict(OP_protein_fasta)
         var_by_prot,transcrit_prot = parse_protvcf_file(protvariantfile)
         seqname_seq = self.get_all_mut_sequences(var_by_prot,transcrit_prot,start_codon,fasta_dict,prot_syno,ipban='')
 

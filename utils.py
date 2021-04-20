@@ -135,7 +135,7 @@ def get_start_codon (tsv,tfasta):
     
     return prot_tx_start  
     
-def OpenVar_analysis(vcf_path, expname, scpecie='human'):
+def OpenVar_analysis(vcf_path, expname, specie='human'):
     filename = vcf_path.split('/')[-1]
     path = vcf_path.replace(filename,'')
     vcf = SeqStudy(
@@ -143,7 +143,7 @@ def OpenVar_analysis(vcf_path, expname, scpecie='human'):
     file_name  = filename, # guid.vcf
     results_dir = filename.replace('.vcf','')+'_result', # .../results/guid/
     study_name = expname, # user input
-    specie = scpecie, # user input
+    specie = specie, # user input
     genome_version = 'hg38', # user input
     annotation  = 'OP_Ensembl' # user input
     )
