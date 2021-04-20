@@ -22,7 +22,7 @@ class OpenCMS:
             print('running Openvar...')
         parsed_snpeff = OpenVar_analysis(self.vcf_path, self.expname)
         print('Parsing...')
-        protvariantfile = get_protvcf_file(parsed_snpeff,expname)
+        protvariantfile = get_protvcf_file(parsed_snpeff,self.expname)
         print('..Done')
         print('calculs...')
         prot_syno = get_synonyms_prot(OP_protein_fasta)
