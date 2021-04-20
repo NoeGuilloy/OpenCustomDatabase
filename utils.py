@@ -157,8 +157,7 @@ def OpenVar_analysis(path, expname, scpecie):
     out = list()
     for f in opvr.list_annOnePerLine_files:
         out.extend(list(opvr.parse_annOnePerLine(f, as_dict=True))
-    
-    return out
+    return out    
 
 def parse_protvcf_file(protvariantfile): #get_variant_by_prot
 
