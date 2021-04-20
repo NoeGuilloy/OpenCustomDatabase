@@ -1,5 +1,5 @@
-from utils import *
-from SNP_handle import *
+from OpenCMS.utils import *
+from OpenCMS.SNP_handle import *
 
 
 class OpenCMS:
