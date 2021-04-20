@@ -145,7 +145,7 @@ def OpenVar_analysis(vcf_path, expname, scpecie='human'):
     study_name = expname, # user input
     specie = scpecie, # user input
     genome_version = 'hg38', # user input
-    annotation  = 'Ensembl' # user input
+    annotation  = 'OP_Ensembl' # user input
     )
 
     opv = OpenVar(
