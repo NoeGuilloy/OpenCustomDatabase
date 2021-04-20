@@ -135,7 +135,7 @@ def get_start_codon (tsv,tfasta):
     
     return prot_tx_start  
     
-def OpenVar_analysis(vcf_path, expname, scpecie):
+def OpenVar_analysis(vcf_path, expname, scpecie='human'):
     filename = vcf_path.split('/')[-1]
     path = vcf_path.replace(filename,'')
     vcf = SeqStudy(
