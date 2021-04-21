@@ -1,5 +1,18 @@
+import itertools as itt
+import numpy as np
+import gzip
+import re
+import collections
+import Bio
+import pyfaidx
+import pickle
+import sys
+from pyfaidx import FastaVariant, Fasta
 from Bio import SeqIO
+from collections import defaultdict
 from collections import Counter
+from collections import OrderedDict
+from operator import itemgetter
 from OpenVar.openvar import SeqStudy, OpenVar, OPVReport
 
 AAcode = {
@@ -179,6 +192,10 @@ def parse_protvcf_file(protvariantfile): #get_variant_by_prot
                 transcrit_prot[prot] = trx
             
     return var_by_prot,transcrit_prot
+
+def fastasynonymes(fasta_prot):
+    prot_syno = get_synonyms_prot(fasta_prot)
+    return prot_syno
 
 def get_protvcf_file(parsenpff,expname):
     parsenpff =sorted(parsenpff, key=lambda x: x['ANN[*].FEATUREID'])
