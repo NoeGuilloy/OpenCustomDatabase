@@ -1,8 +1,8 @@
 from OpenCMS.utils import *
 from OpenCMS.SNP_handle import *
-OP_protein_fasta = '/home/OpenCMS/Databases/OpenProt_DB_Ensemble_1_6.fasta'
-transcrit_fasta = '/home/OpenCMS/Databases/gencode.v29.transcripts.fa'
-OP_tsv = '/home/OpenCMS/Databases/human-openprot-r1_6-refprots+altprots+isoforms-+uniprot2019_03_01.tsv'
+OP_protein_fasta = '/home/noeguill/OpenCMS/Databases/OpenProt_DB_Ensemble_1_6.fasta'
+transcrit_fasta = '/home/noeguill/OpenCMS/Databases/gencode.v29.transcripts.fa'
+OP_tsv = '/home/noeguill/OpenCMS/Databases/human-openprot-r1_6-refprots+altprots+isoforms-+uniprot2019_03_01.tsv'
 
 class OpenCMS:
     def __init__(self, 
