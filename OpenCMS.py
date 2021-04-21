@@ -11,6 +11,7 @@ class OpenCMS:
     input_kallisto = None,
     trxnumber = None,
     tpmnumber = None,
+    ipban = None,
     annotation='ensembl'):
         self.vcf_path = vcf_path
         self.expname = expname
@@ -18,6 +19,7 @@ class OpenCMS:
         self.trxnumber = trxnumber
         self.tpmnumber = tpmnumber
         self.annotation=annotation
+        self.ipban = ipban
 
     def run(self, verbose=True):
         if verbose:
@@ -31,7 +33,7 @@ class OpenCMS:
         start_codon = get_start_codon(OP_tsv, transcrit_fasta)
         fasta_dict = get_fasta_dict(OP_protein_fasta)
         var_by_prot,transcrit_prot = parse_protvcf_file(protvariantfile)
-        seqname_seq = self.get_all_mut_sequences(var_by_prot,transcrit_prot,start_codon,fasta_dict,prot_syno,ipban='')
+        seqname_seq = self.get_all_mut_sequences(var_by_prot,transcrit_prot,start_codon,fasta_dict,prot_syno,self.ipban)
         print('phase2')
         if input_kallisto:
             print('started')
@@ -39,34 +41,34 @@ class OpenCMS:
             print('append_wt_prot_to_transcrit_ENS done')
             trx_allprot= get_mutated_protbytranscrit(seqname_seq,OP_protein_fasta,trx_allprot)
             print('get_mutated_protbytranscrit done')
-            AllProtInMyDB = get_100_prot(input_kallisto,prot_syno,trx_allprot,trxnumber,trxsave,tpmnumber)
+            AllProtInMyDB = get_100_prot(self.input_kallisto,prot_syno,trx_allprot,self.trxnumber,self.trxsave,self.tpmnumber)
             DB_custom = assembling_headers_sequences(AllProtInMyDB,seqname_seq,prot_syno,fasta_dict)
-            DB_custom = reomve_duplicata_from_db(DB_custom)
-            write_Fasta_DB(DB_custom,expname)
+            DB_custom = remove_duplicata_from_db(DB_custom)
+            write_Fasta_DB(DB_custom,self.expname)
             return (trx_allprot,AllProtInMyDB,DB_custom,seqname_seq)
 
-    def get_all_mut_sequences(self,var_by_prot,transcrit_prot,start_codon,fasta_dict,prot_syno,ipban):
-        seqname_seq=dict()
-        for acc,svar in var_by_prot.items():
-            if ipban=='yes':
-                if acc[0:3]=='II_' or acc [0:3]=='IP_':continue
-            regroupement_HGVS_C = list()
-            regroupement_HGVS_P = list()
-            for var in svar:
-                parsed_HGVS_C = Parse_HGVS_C(var['HGVS_C'])
-                parsed_HGVS_P = var['HGVS_P'].split('.',1)[1]
-                regroupement_HGVS_C.extend(parsed_HGVS_C)
-                regroupement_HGVS_P.append(parsed_HGVS_P)
-            sorted_HGVS_C = sort_sequences(regroupement_HGVS_C)
-            seqname = acc+'@'+''.join(regroupement_HGVS_P)
-            mutated_sequence = modify_transcript_sequence(sorted_HGVS_C,acc,transcrit_prot,start_codon)
-            translated_mutated_sequence = translate(mutated_sequence)
-            if 'synonymous_variant' in mutated_sequence or translated_mutated_sequence == 'start_lost' or len(translated_mutated_sequence)<7:continue
-            elif translated_mutated_sequence in seqname_seq.values():continue
-            else:
-                seqname_seq[seqname]=translated_mutated_sequence
-        seqname_seq=remove_fakevariant(seqname_seq,fasta_dict,prot_syno)
-        return seqname_seq
+def get_all_mut_sequences(self,var_by_prot,transcrit_prot,start_codon,fasta_dict,prot_syno,ipban):
+    seqname_seq=dict()
+    for acc,svar in var_by_prot.items():
+        if ipban=='yes':
+            if acc[0:3]=='II_' or acc [0:3]=='IP_':continue
+        regroupement_HGVS_C = list()
+        regroupement_HGVS_P = list()
+        for var in svar:
+            parsed_HGVS_C = Parse_HGVS_C(var['HGVS_C'])
+            parsed_HGVS_P = var['HGVS_P'].split('.',1)[1]
+            regroupement_HGVS_C.extend(parsed_HGVS_C)
+            regroupement_HGVS_P.append(parsed_HGVS_P)
+        sorted_HGVS_C = sort_sequences(regroupement_HGVS_C)
+        seqname = acc+'@'+''.join(regroupement_HGVS_P)
+        mutated_sequence = modify_transcript_sequence(sorted_HGVS_C,acc,transcrit_prot,start_codon)
+        translated_mutated_sequence = translate(mutated_sequence)
+        if 'synonymous_variant' in mutated_sequence or translated_mutated_sequence == 'start_lost' or len(translated_mutated_sequence)<7:continue
+        elif translated_mutated_sequence in seqname_seq.values():continue
+        else:
+            seqname_seq[seqname]=translated_mutated_sequence
+    seqname_seq=remove_fakevariant(seqname_seq,fasta_dict,prot_syno)
+    return seqname_seq
 
 def append_wt_prot_to_transcrit_by_fasta (fasta):
     trx_allprot = defaultdict(list)

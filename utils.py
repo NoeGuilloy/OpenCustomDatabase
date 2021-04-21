@@ -94,7 +94,7 @@ def sort_sequences(hgvsc_snp):
     
     return hgvsc_snp_sorted
 
-def reomve_duplicata_from_db(DB_custom):
+def remove_duplicata_from_db(DB_custom):
     duplicata = list()
     seek_duplicate = Counter(DB_custom.values())
     for x,y in seek_duplicate.items():
