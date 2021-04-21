@@ -12,6 +12,7 @@ class OpenCMS:
     trxnumber = None,
     tpmnumber = None,
     ipban = None,
+    trxsave = None,
     annotation='ensembl'):
         self.vcf_path = vcf_path
         self.expname = expname
@@ -20,13 +21,14 @@ class OpenCMS:
         self.tpmnumber = tpmnumber
         self.annotation=annotation
         self.ipban = ipban
+        self.trxsave = trxsave
 
     def run(self, verbose=True):
         if verbose:
             print('running Openvar...')
         parsed_snpeff = OpenVar_analysis(self.vcf_path, self.expname)
         print('Parsing...')
-        protvariantfile = get_protvcf_file(parsed_snpeff,self.expname)
+        protvariantfile = get_protvcf_file(parsed_snpeff, self.expname, self.vcf_path)
         print('..Done')
         print('calculs...')
         prot_syno = get_synonyms_prot(OP_protein_fasta)
@@ -41,11 +43,10 @@ class OpenCMS:
             print('append_wt_prot_to_transcrit_ENS done')
             trx_allprot= get_mutated_protbytranscrit(seqname_seq,OP_protein_fasta,trx_allprot)
             print('get_mutated_protbytranscrit done')
-            AllProtInMyDB = get_100_prot(self.input_kallisto,prot_syno,trx_allprot,self.trxnumber,self.trxsave,self.tpmnumber)
+            AllProtInMyDB = get_100_prot(self.input_kallisto, prot_syno,trx_allprot, self.trxnumber, self.trxsave, self.tpmnumber)
             DB_custom = assembling_headers_sequences(AllProtInMyDB,seqname_seq,prot_syno,fasta_dict)
             DB_custom = remove_duplicata_from_db(DB_custom)
-            write_Fasta_DB(DB_custom,self.expname,vcf_path)
-            return (trx_allprot,AllProtInMyDB,DB_custom,seqname_seq)
+            write_Fasta_DB(DB_custom, self.expname, self.vcf_path)
 
 def get_all_mut_sequences(var_by_prot,transcrit_prot,start_codon,fasta_dict,prot_syno,ipban):
     seqname_seq=dict()
