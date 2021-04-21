@@ -197,7 +197,7 @@ def fastasynonymes(fasta_prot):
     prot_syno = get_synonyms_prot(fasta_prot)
     return prot_syno
 
-def get_protvcf_file(parsenpff,expname,vcf_path):
+def get_protvcf_file(parsenpff, expname, vcf_path):
     parsenpff =sorted(parsenpff, key=lambda x: x['ANN[*].FEATUREID'])
     filename = vcf_path.split('/')[-1]
     path = vcf_path.replace(filename,expname+'_tab')
