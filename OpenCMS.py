@@ -33,7 +33,7 @@ class OpenCMS:
         start_codon = get_start_codon(OP_tsv, transcrit_fasta)
         fasta_dict = get_fasta_dict(OP_protein_fasta)
         var_by_prot,transcrit_prot = parse_protvcf_file(protvariantfile)
-        seqname_seq = self.get_all_mut_sequences(var_by_prot,transcrit_prot,start_codon,fasta_dict,prot_syno,self.ipban)
+        seqname_seq = get_all_mut_sequences(var_by_prot,transcrit_prot,start_codon,fasta_dict,prot_syno,self.ipban)
         print('phase2')
         if input_kallisto:
             print('started')
@@ -44,10 +44,10 @@ class OpenCMS:
             AllProtInMyDB = get_100_prot(self.input_kallisto,prot_syno,trx_allprot,self.trxnumber,self.trxsave,self.tpmnumber)
             DB_custom = assembling_headers_sequences(AllProtInMyDB,seqname_seq,prot_syno,fasta_dict)
             DB_custom = remove_duplicata_from_db(DB_custom)
-            write_Fasta_DB(DB_custom,self.expname)
+            write_Fasta_DB(DB_custom,self.expname,vcf_path)
             return (trx_allprot,AllProtInMyDB,DB_custom,seqname_seq)
 
-def get_all_mut_sequences(self,var_by_prot,transcrit_prot,start_codon,fasta_dict,prot_syno,ipban):
+def get_all_mut_sequences(var_by_prot,transcrit_prot,start_codon,fasta_dict,prot_syno,ipban):
     seqname_seq=dict()
     for acc,svar in var_by_prot.items():
         if ipban=='yes':
@@ -181,3 +181,10 @@ def assembling_headers_sequences(AllProtInMyDB,Msequence,prot_syno,fasta_dict):
     
     return DB_custom
 
+def write_Fasta_DB(DB_custom,expname,vcf_path):
+    path = vcf_path.replace(filename,(expname+'.fasta')
+    with open (path, 'w') as f:
+        for acc, prot_seq in DB_custom.items():
+            f.write('>'+acc+'\n')
+            f.write(truncate(prot_seq+'\n'))
+    return print(path+'is done')

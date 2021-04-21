@@ -197,8 +197,9 @@ def fastasynonymes(fasta_prot):
     prot_syno = get_synonyms_prot(fasta_prot)
     return prot_syno
 
-def get_protvcf_file(parsenpff,expname):
+def get_protvcf_file(parsenpff,expname,vcf_path):
     parsenpff =sorted(parsenpff, key=lambda x: x['ANN[*].FEATUREID'])
+    
     with open(expname+'_prot.tab', 'w') as fwrite:
         fwrite.write('Prot'+'\t'+'Transcrit'+'\t'+'HGVS_P'+'\t'+'HGVS_C'+'\t'+'Potential_Error'+'\n')
         for n in parsenpff:
@@ -213,5 +214,4 @@ def get_protvcf_file(parsenpff,expname):
                     fwrite.write(prot+'\t'+trans+'\t'+n['ANN[*].HGVS_P']+'\t'+n['ANN[*].HGVS_C']+'\t'+n['ANN[*].ERRORS']+'\n')
                 else:continue
                     
-    protvariantfile = expname+'_prot.tab'
-    return(protvariantfile)
+    return path
