@@ -217,3 +217,6 @@ def get_protvcf_file(parsenpff, expname, vcf_path):
                 else:continue
                     
     return path
+
+def truncate(seq, length=80):
+    return '\n'.join([seq[n:n+length] for n in range(0, len(seq), length)])
