@@ -91,7 +91,6 @@ def get_100_prot(trx_expression,prot_syno,trx_allprot,trxnumber,trxsave,tpmnumbe
         treshold = trxnumber
     else:
         treshold = 100000
-    counter = 0
     for prot,tpm in trx_expression_sorted.items():
         if tpmnumber:
             if tpm<tpmnumber:continue
