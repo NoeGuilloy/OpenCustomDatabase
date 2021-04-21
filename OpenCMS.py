@@ -154,6 +154,26 @@ def get_mutated_protbytranscrit(seqname_seq,transcrit_prot,trx_allprot):
                 trx_allprot[transcrit].append(prot_mut)
     return trx_allprot
 
+def modify_transcript_sequence(HGVS_C_snp_sorted,protacc,transcrit_prot,start_codon):
+    trx = str(transcrit_prot[protacc])
+    acc = protacc.split('.',1)[0]
+    mseq = [x for x in str(start_codon[acc+'^'+trx])]
+    for variant in HGVS_C_snp_sorted:
+        if variant['effect'] == 'del':
+            if mseq[int(variant['pos'])-1]:
+                mseq[int(variant['pos'])-1] = ""
+        if variant['effect'] == 'ins':
+            mseq.insert(int(variant['pos']), variant['nt'])
+        if variant['effect'] == 'replace':
+            mseq[int(variant['pos'])-1] = variant['nt']
+    mseq[:] = [x for x in mseq if x !='']
+    if translate(''.join(mseq)) == translate(''.join([x for x in str(start_codon[acc+'^'+trx])])):
+        return 'synonymous_variant',acc
+    if len(translate(''.join(mseq))) < 8:
+        return 'toosmall',acc
+    mseq = "".join(mseq)
+    return mseq
+
 def get_m_wtprot(seqname_seq):
     m_wtprot = list()
     for prot_mut in seqname_seq:
