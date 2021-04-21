@@ -199,6 +199,8 @@ def fastasynonymes(fasta_prot):
 
 def get_protvcf_file(parsenpff,expname,vcf_path):
     parsenpff =sorted(parsenpff, key=lambda x: x['ANN[*].FEATUREID'])
+    filename = vcf_path.split('/')[-1]
+    path = vcf_path.replace(filename,expname+'_tab')
     
     with open(expname+'_prot.tab', 'w') as fwrite:
         fwrite.write('Prot'+'\t'+'Transcrit'+'\t'+'HGVS_P'+'\t'+'HGVS_C'+'\t'+'Potential_Error'+'\n')

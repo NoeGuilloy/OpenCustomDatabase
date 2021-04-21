@@ -182,8 +182,9 @@ def assembling_headers_sequences(AllProtInMyDB,Msequence,prot_syno,fasta_dict):
     return DB_custom
 
 def write_Fasta_DB(DB_custom,expname,vcf_path):
-    path = vcf_path.replace(filename,(expname+'.fasta')
-    with open (path, 'w') as f:
+    filename = vcf_path.split('/')[-1]
+    path = vcf_path.replace(filename,expname+'.fasta')
+    with open(path, 'w') as f:
         for acc, prot_seq in DB_custom.items():
             f.write('>'+acc+'\n')
             f.write(truncate(prot_seq+'\n'))
