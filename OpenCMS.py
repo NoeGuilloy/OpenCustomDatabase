@@ -37,7 +37,7 @@ class OpenCMS:
         var_by_prot,transcrit_prot = parse_protvcf_file(protvariantfile)
         seqname_seq = get_all_mut_sequences(var_by_prot,transcrit_prot,start_codon,fasta_dict,prot_syno,self.ipban)
         print('phase2')
-        if input_kallisto:
+        if self.input_kallisto:
             print('started')
             trx_allprot= append_wt_prot_to_transcrit_by_fasta(OP_protein_fasta)
             print('append_wt_prot_to_transcrit_ENS done')
