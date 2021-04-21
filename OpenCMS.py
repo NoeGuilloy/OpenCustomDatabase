@@ -39,9 +39,9 @@ class OpenCMS:
         print('phase2')
         if self.input_kallisto:
             print('started')
-            trx_allprot= append_wt_prot_to_transcrit_by_fasta(fasta_dict)
+            trx_allprot= append_wt_prot_to_transcrit_by_fasta(OP_protein_fasta)
             print('append_wt_prot_to_transcrit_ENS done')
-            trx_allprot= get_mutated_protbytranscrit(seqname_seq,fasta_dict,trx_allprot)
+            trx_allprot= get_mutated_protbytranscrit(seqname_seq,transcrit_prot,trx_allprot)
             print('get_mutated_protbytranscrit done')
             AllProtInMyDB = get_100_prot(self.input_kallisto, prot_syno,trx_allprot, self.trxnumber, self.trxsave, self.tpmnumber)
             DB_custom = assembling_headers_sequences(AllProtInMyDB,seqname_seq,prot_syno,fasta_dict)
