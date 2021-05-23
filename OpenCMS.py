@@ -2,7 +2,7 @@ from OpenCMS.utils import *
 from OpenCMS.SNP_handle import *
 OP_protein_fasta = '/home/noeguill/OpenCMS/Databases/OpenProt_DB_Ensemble_1_6.fasta'
 transcrit_fasta = '/home/noeguill/OpenCMS/Databases/gencode.v29.transcripts.fa'
-OP_tsv = '/home/noeguill/OpenCMS/Databases/human-openprot-r1_6-refprots+altprots+isoforms-+uniprot2019_03_01.tsv'
+OP_tsv = '/home/noeguill/OpenCMS/Databases/human-openprot-r1_6-refprots+altprots+isoforms-ensembleonly.tsv'
 
 class OpenCMS:
     def __init__(self, 
@@ -13,6 +13,7 @@ class OpenCMS:
     tpmnumber = None,
     ipban = None,
     trxsave = None,
+    trxexclude = None,
     annotation='ensembl'):
         self.vcf_path = vcf_path
         self.expname = expname
@@ -22,6 +23,7 @@ class OpenCMS:
         self.annotation=annotation
         self.ipban = ipban
         self.trxsave = trxsave
+        self.trxexclude = trxexclude
 
     def run(self, verbose=True):
         if verbose:
@@ -43,7 +45,7 @@ class OpenCMS:
             print('append_wt_prot_to_transcrit_ENS done')
             trx_allprot= get_mutated_protbytranscrit(seqname_seq,transcrit_prot,trx_allprot)
             print('get_mutated_protbytranscrit done')
-            AllProtInMyDB = get_100_prot(self.input_kallisto, prot_syno,trx_allprot, self.trxnumber, self.trxsave, self.tpmnumber)
+            AllProtInMyDB = get_100_prot(self.input_kallisto, prot_syno,trx_allprot, self.trxnumber, self.trxsave, self.tpmnumber, self.trxeclude)
             DB_custom = assembling_headers_sequences(AllProtInMyDB,seqname_seq,prot_syno,fasta_dict)
             DB_custom = remove_duplicata_from_db(DB_custom)
             write_Fasta_DB(DB_custom, self.expname, self.vcf_path)
@@ -84,9 +86,10 @@ def append_wt_prot_to_transcrit_by_fasta (fasta):
                     trx_allprot[trx.split('.')[0]].append(prx.split('.')[0])
     return trx_allprot
 
-def get_100_prot(trx_expression,prot_syno,trx_allprot,trxnumber,trxsave,tpmnumber):
-    trx_expression_sorted = get_trxs_by_tpm_from_kallisto(trx_expression)
+def get_100_prot(trx_expression,prot_syno,trx_allprot,trxnumber,trxsave,tpmnumber,trxeclude):
+    trx_expression_sorted = get_trxs_by_tpm_from_kallisto(trx_expression,trxeclude)
     AllProtInMyDB = set()
+    
     if trxnumber:
         treshold = trxnumber
     else:
@@ -127,10 +130,19 @@ def get_100_prot(trx_expression,prot_syno,trx_allprot,trxnumber,trxsave,tpmnumbe
                         if prot_syno[y] not in AllProtInMyDB:
                             AllProtInMyDB.add(prot_syno[y])
                     else:
-                        AllProtInMyDB.add(y)                                      
+                        AllProtInMyDB.add(y)
+                
     return(AllProtInMyDB)
 
-def get_trxs_by_tpm_from_kallisto (trx_expression):
+def get_trxs_by_tpm_from_kallisto (trx_expression,trxeclude):
+    if trxeclude:
+        liste_exclusion = list()
+        with open(trxeclude, 'r') as fex:
+            for n,l in enumerate(fex):
+                liste_exclusion.append(l.split('\n')[0])
+    else :
+        liste_exclusion = " "
+        
     trxp_tpms = {}
     with open(trx_expression, 'r') as f:
         for n,l in enumerate(f):
@@ -142,6 +154,7 @@ def get_trxs_by_tpm_from_kallisto (trx_expression):
             trxp = line['target_id'].split('.')[0]
             tpm = float(line['tpm'])
             if tpm >0:
+                if trxp in liste_exclusion:continue
                 trxp_tpms[trxp] = tpm
     trxp_tpms_sorted_pour_tresh = OrderedDict(sorted(trxp_tpms.items(), key=itemgetter(1), reverse=True))
     return (trxp_tpms_sorted_pour_tresh)
