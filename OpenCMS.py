@@ -27,6 +27,13 @@ class OpenCMS:
 
     def run(self, verbose=True):
         if verbose:
+            print('checking files')
+        checkex = checking_trx_files(self.trxexclude)
+        checksv = checking_trx_files(self.trxsave)
+        if checkex = False:
+            print('Make sure your exclusion transcrit file is well written')
+        if checksv = False:
+            print('Make sure your save transcrit file is well written')
             print('running Openvar...')
         parsed_snpeff = OpenVar_analysis(self.vcf_path, self.expname)
         print('Parsing...')
