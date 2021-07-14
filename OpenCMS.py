@@ -127,7 +127,7 @@ def get_100_prot(trx_expression,prot_syno,trx_allprot,trxnumber,trxsave,tpmnumbe
     if trxsave:
         with open(trxsave, 'r') as f:
             for n,l in enumerate(f):
-                for y in trx_allprot[l]:
+                for y in trx_allprot[l.split('.')[0]]:
                     if y in prot_syno:
                         if prot_syno[y] not in AllProtInMyDB:
                             AllProtInMyDB.add(prot_syno[y])
