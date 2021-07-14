@@ -41,11 +41,11 @@ class OpenCMS:
         print('phase2')
         if self.input_kallisto:
             print('started')
-            trx_allprot= append_wt_prot_to_transcrit_by_fasta(OP_protein_fasta)
+            trx_allprot= append_wt_prot_to_transcrit_by_fasta(OP_protein_fasta,self.ipban)
             print('append_wt_prot_to_transcrit_ENS done')
             trx_allprot= get_mutated_protbytranscrit(seqname_seq,transcrit_prot,trx_allprot)
             print('get_mutated_protbytranscrit done')
-            AllProtInMyDB = get_100_prot(self.input_kallisto, prot_syno,trx_allprot, self.trxnumber, self.trxsave, self.tpmnumber, self.trxeclude)
+            AllProtInMyDB = get_100_prot(self.input_kallisto, prot_syno,trx_allprot, self.trxnumber, self.trxsave, self.tpmnumber, self.trxexclude)
             DB_custom = assembling_headers_sequences(AllProtInMyDB,seqname_seq,prot_syno,fasta_dict)
             DB_custom = remove_duplicata_from_db(DB_custom)
             write_Fasta_DB(DB_custom, self.expname, self.vcf_path)
@@ -73,7 +73,7 @@ def get_all_mut_sequences(var_by_prot,transcrit_prot,start_codon,fasta_dict,prot
     seqname_seq=remove_fakevariant(seqname_seq,fasta_dict,prot_syno)
     return seqname_seq
 
-def append_wt_prot_to_transcrit_by_fasta (fasta):
+def append_wt_prot_to_transcrit_by_fasta (fasta,ipban):
     trx_allprot = defaultdict(list)
     with open(fasta, 'r')as f:
         for n,l in enumerate(f):
@@ -83,11 +83,13 @@ def append_wt_prot_to_transcrit_by_fasta (fasta):
             prxs=parsedheader['PA'].split(',')
             for trx in trxs:
                 for prx in prxs:
+                    if ipban == "yes":
+                        if prx[0:3]=='II_' or prx [0:3]=='IP_':continue
                     trx_allprot[trx.split('.')[0]].append(prx.split('.')[0])
     return trx_allprot
 
-def get_100_prot(trx_expression,prot_syno,trx_allprot,trxnumber,trxsave,tpmnumber,trxeclude):
-    trx_expression_sorted = get_trxs_by_tpm_from_kallisto(trx_expression,trxeclude)
+def get_100_prot(trx_expression,prot_syno,trx_allprot,trxnumber,trxsave,tpmnumber,trxexclude):
+    trx_expression_sorted = get_trxs_by_tpm_from_kallisto(trx_expression,trxexclude)
     AllProtInMyDB = set()
     
     if trxnumber:
@@ -131,13 +133,13 @@ def get_100_prot(trx_expression,prot_syno,trx_allprot,trxnumber,trxsave,tpmnumbe
                             AllProtInMyDB.add(prot_syno[y])
                     else:
                         AllProtInMyDB.add(y)
-                
+    print(prot,tpm)            
     return(AllProtInMyDB)
 
-def get_trxs_by_tpm_from_kallisto (trx_expression,trxeclude):
-    if trxeclude:
+def get_trxs_by_tpm_from_kallisto (trx_expression,trxexclude):
+    if trxexclude:
         liste_exclusion = list()
-        with open(trxeclude, 'r') as fex:
+        with open(trxexclude, 'r') as fex:
             for n,l in enumerate(fex):
                 liste_exclusion.append(l.split('\n')[0])
     else :
