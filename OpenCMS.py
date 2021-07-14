@@ -216,7 +216,6 @@ def assembling_headers_sequences(AllProtInMyDB,Msequence,prot_syno,fasta_dict):
     
     return DB_custom
 
-
 def stat_summary(effective_threshold,DB_custom,expname,vcf_path):
     Number_IP = 0
     Number_IPvar = 0
