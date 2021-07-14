@@ -30,11 +30,14 @@ class OpenCMS:
             print('checking files')
         checkex = checking_trx_files(self.trxexclude)
         checksv = checking_trx_files(self.trxsave)
+        checkka = abundance_check(self.input_kallisto)
         if checkex = False:
-            print('Make sure your exclusion transcrit file is well written')
+            return print('Make sure your exclusion transcrit file is well written')
         if checksv = False:
-            print('Make sure your save transcrit file is well written')
-            print('running Openvar...')
+            return print('Make sure your save transcrit file is well written')
+        if checksv = False:
+            return print('Make sure your kallisto-quant file is not corrupted')
+        print('running Openvar...')
         parsed_snpeff = OpenVar_analysis(self.vcf_path, self.expname)
         print('Parsing...')
         protvariantfile = get_protvcf_file(parsed_snpeff, self.expname, self.vcf_path)
@@ -56,6 +59,28 @@ class OpenCMS:
             DB_custom = assembling_headers_sequences(AllProtInMyDB,seqname_seq,prot_syno,fasta_dict)
             DB_custom = remove_duplicata_from_db(DB_custom)
             write_Fasta_DB(DB_custom, self.expname, self.vcf_path,effective_threshold)
+
+def abundance_check(input_kallisto):
+    if input_kallisto:
+        with open(input_kallisto, 'r') as f:
+            for n,l in enumerate(f):
+                if n == 0:
+                    if l != 'target_id\tlength\teff_length\test_counts\ttpm\n':
+                        return False
+                else:
+                    if len(l.split('\t'))!=4:
+                        return False
+    return True
+
+def checking_trx_files(trxfile):
+    if trxfile:
+        with open(trxfile, 'r') as f:
+            for n,l in enumerate(f):
+                if l[0:4] != 'ENST' and if l[0:3] != 'NM_' and if l[0:3] != 'XM_':
+                    return False
+                if len(l)>40
+                    return False
+    return True
 
 def get_all_mut_sequences(var_by_prot,transcrit_prot,start_codon,fasta_dict,prot_syno,ipban):
     seqname_seq=dict()
