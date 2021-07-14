@@ -9,9 +9,9 @@ class OpenCMS:
     vcf_path,
     expname,
     input_kallisto = None,
-    trxnumber = None,
-    tpmnumber = None,
-    ipban = None,
+    trxnumber = None,          #10000-1000000
+    tpmnumber = None,          #0-1000000
+    ipban = None,              #yes
     trxsave = None,
     trxexclude = None,
     annotation='ensembl'):
@@ -141,7 +141,7 @@ def get_trxs_by_tpm_from_kallisto (trx_expression,trxexclude):
         liste_exclusion = list()
         with open(trxexclude, 'r') as fex:
             for n,l in enumerate(fex):
-                liste_exclusion.append(l.split('\n')[0])
+                liste_exclusion.append(l.split('\n')[0].split('.')[0])
     else :
         liste_exclusion = " "
         
