@@ -31,11 +31,11 @@ class OpenCMS:
         checkex = checking_trx_files(self.trxexclude)
         checksv = checking_trx_files(self.trxsave)
         checkka = abundance_check(self.input_kallisto)
-        if checkex = False:
+        if checkex == False:
             return print('Make sure your exclusion transcrit file is well written')
-        if checksv = False:
+        if checksv == False:
             return print('Make sure your save transcrit file is well written')
-        if checksv = False:
+        if checksv == False:
             return print('Make sure your kallisto-quant file is not corrupted')
         print('running Openvar...')
         parsed_snpeff = OpenVar_analysis(self.vcf_path, self.expname)
@@ -76,11 +76,32 @@ def checking_trx_files(trxfile):
     if trxfile:
         with open(trxfile, 'r') as f:
             for n,l in enumerate(f):
-                if l[0:4] != 'ENST' and if l[0:3] != 'NM_' and if l[0:3] != 'XM_':
+                if l[0:4] != 'ENST' and  l[0:3] != 'NM_' and  l[0:3] != 'XM_':
                     return False
-                if len(l)>40
+                if len(l)>40:
                     return False
     return True
+
+def differentiate_syno_missense(regroupement_HGVS_P):
+    HGVS_P_missense=list()
+    HGVS_P_synonyme=list()
+    for HGVS_P in regroupement_HGVS_P:
+        firstcodon=list()
+        secondcodon=list()
+        separator=list()
+        for c in HGVS_P:
+            if c.isalpha() or c=='?' or c=='*' or c=='_':
+                if len(separator)>0:
+                    secondcodon.append(c)
+                else:
+                    firstcodon.append(c)
+            elif not c.isalpha():
+                separator.append(c)       
+        if ''.join(firstcodon) != ''.join(secondcodon):
+            HGVS_P_missense.append(HGVS_P)
+        else:
+            HGVS_P_synonyme.append(HGVS_P)
+    return(HGVS_P_missense,HGVS_P_synonyme)
 
 def get_all_mut_sequences(var_by_prot,transcrit_prot,start_codon,fasta_dict,prot_syno,ipban):
     seqname_seq=dict()
@@ -94,8 +115,12 @@ def get_all_mut_sequences(var_by_prot,transcrit_prot,start_codon,fasta_dict,prot
             parsed_HGVS_P = var['HGVS_P'].split('.',1)[1]
             regroupement_HGVS_C.extend(parsed_HGVS_C)
             regroupement_HGVS_P.append(parsed_HGVS_P)
+        HGVS_P_missense,HGVS_P_synonyme=differentiate_syno_missense(regroupement_HGVS_P)
         sorted_HGVS_C = sort_sequences(regroupement_HGVS_C)
-        seqname = acc+'@'+''.join(regroupement_HGVS_P)
+        if len(HGVS_P_synonyme)>0:
+            seqname = acc+'@'+''.join(HGVS_P_missense)+'['+''.join(HGVS_P_synonyme)+']'
+        else:
+            seqname = acc+'@'+''.join(HGVS_P_missense)
         mutated_sequence = modify_transcript_sequence(sorted_HGVS_C,acc,transcrit_prot,start_codon)
         translated_mutated_sequence = translate(mutated_sequence)
         if 'synonymous_variant' in mutated_sequence or translated_mutated_sequence == 'start_lost' or len(translated_mutated_sequence)<7:continue
@@ -256,7 +281,7 @@ def stat_summary(effective_threshold,DB_custom,expname,vcf_path):
     Number_ref = 0
     Number_refvar = 0
     for acc in DB_custom.keys():
-         if acc[:3]=='IP_':
+        if acc[:3]=='IP_':
             if '@' in acc:
                 Number_IPvar = Number_IPvar+1
             else:
@@ -275,7 +300,7 @@ def stat_summary(effective_threshold,DB_custom,expname,vcf_path):
     path = filename.replace('.vcf','')+'_result/'+expname+'summary.tsv'
     with open(path, 'w') as f:
         f.write('effective_threshold\taltProt (IP) \tnovel isoform (II)\trefprot\taltProt_variants (IP) \tnovel isoform_variants (II)\trefprot_variants\n')
-        f.write(effective_threshold+'\t'+Number_IP+'\t'+Number_II+'\t'+refprot+'\t'+Number_IPvar+'\t'+Number_IIvar+'\t'+Number_refvar'\n')
+        f.write(effective_threshold+'\t'+Number_IP+'\t'+Number_II+'\t'+refprot+'\t'+Number_IPvar+'\t'+Number_IIvar+'\t'+Number_refvar+'\n')
 
 def write_Fasta_DB(DB_custom,expname,vcf_path,effective_threshold):
     filename = vcf_path.split('/')[-1]
