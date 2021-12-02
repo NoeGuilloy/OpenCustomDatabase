@@ -20,7 +20,7 @@ class OpenCMS:
         self.input_kallisto = input_kallisto
         self.trxnumber = trxnumber
         self.tpmnumber = tpmnumber
-        self.annotation=annotation
+        self.annotation = annotation
         self.ipban = ipban
         self.trxsave = trxsave
         self.trxexclude = trxexclude
@@ -35,7 +35,7 @@ class OpenCMS:
             return print('Make sure your exclusion transcrit file is well written')
         if checksv == False:
             return print('Make sure your save transcrit file is well written')
-        if checksv == False:
+        if checkka == False:
             return print('Make sure your kallisto-quant file is not corrupted')
         print('running Openvar...')
         parsed_snpeff = OpenVar_analysis(self.vcf_path, self.expname)
@@ -68,7 +68,7 @@ def abundance_check(input_kallisto):
                     if l != 'target_id\tlength\teff_length\test_counts\ttpm\n':
                         return False
                 else:
-                    if len(l.split('\t'))!=4:
+                    if len(l.split('\t'))!=5:
                         return False
     return True
 
@@ -82,27 +82,6 @@ def checking_trx_files(trxfile):
                     return False
     return True
 
-def differentiate_syno_missense(regroupement_HGVS_P):
-    HGVS_P_missense=list()
-    HGVS_P_synonyme=list()
-    for HGVS_P in regroupement_HGVS_P:
-        firstcodon=list()
-        secondcodon=list()
-        separator=list()
-        for c in HGVS_P:
-            if c.isalpha() or c=='?' or c=='*' or c=='_':
-                if len(separator)>0:
-                    secondcodon.append(c)
-                else:
-                    firstcodon.append(c)
-            elif not c.isalpha():
-                separator.append(c)       
-        if ''.join(firstcodon) != ''.join(secondcodon):
-            HGVS_P_missense.append(HGVS_P)
-        else:
-            HGVS_P_synonyme.append(HGVS_P)
-    return(HGVS_P_missense,HGVS_P_synonyme)
-
 def get_all_mut_sequences(var_by_prot,transcrit_prot,start_codon,fasta_dict,prot_syno,ipban):
     seqname_seq=dict()
     for acc,svar in var_by_prot.items():
@@ -115,12 +94,8 @@ def get_all_mut_sequences(var_by_prot,transcrit_prot,start_codon,fasta_dict,prot
             parsed_HGVS_P = var['HGVS_P'].split('.',1)[1]
             regroupement_HGVS_C.extend(parsed_HGVS_C)
             regroupement_HGVS_P.append(parsed_HGVS_P)
-        HGVS_P_missense,HGVS_P_synonyme=differentiate_syno_missense(regroupement_HGVS_P)
         sorted_HGVS_C = sort_sequences(regroupement_HGVS_C)
-        if len(HGVS_P_synonyme)>0:
-            seqname = acc+'@'+''.join(HGVS_P_missense)+'['+''.join(HGVS_P_synonyme)+']'
-        else:
-            seqname = acc+'@'+''.join(HGVS_P_missense)
+        seqname = acc+'@'+''.join(regroupement_HGVS_P)
         mutated_sequence = modify_transcript_sequence(sorted_HGVS_C,acc,transcrit_prot,start_codon)
         translated_mutated_sequence = translate(mutated_sequence)
         if 'synonymous_variant' in mutated_sequence or translated_mutated_sequence == 'start_lost' or len(translated_mutated_sequence)<7:continue
@@ -155,9 +130,8 @@ def get_100_prot(trx_expression,prot_syno,trx_allprot,trxnumber,trxsave,tpmnumbe
         treshold = 100000
     for prot,tpm in trx_expression_sorted.items():
         if tpmnumber:
-            if tpm<tpmnumber:continue
-            for y in trx_allprot[prot]:    
-                if len(AllProtInMyDB)<treshold:
+            if tpm>tpmnumber:
+                for y in trx_allprot[prot]:    
                     if y in prot_syno:
                         if prot_syno[y] not in AllProtInMyDB:
                             AllProtInMyDB.add(prot_syno[y])
@@ -165,9 +139,9 @@ def get_100_prot(trx_expression,prot_syno,trx_allprot,trxnumber,trxsave,tpmnumbe
                         AllProtInMyDB.add(y)
                     if y not in AllProtInMyDB and prot_syno[y] not in AllProtInMyDB:
                         print('not_taken',prot,y)
-                else:
-                    print(prot,tpm)
-                    return(AllProtInMyDB,tpm)
+            else:
+                print(prot,tpm)
+                return(AllProtInMyDB,tpm)
         else:
             for y in trx_allprot[prot]:    
                 if len(AllProtInMyDB)<treshold:
@@ -286,13 +260,13 @@ def stat_summary(effective_threshold,DB_custom,expname,vcf_path):
                 Number_IPvar = Number_IPvar+1
             else:
                 Number_IP = Number_IP+1
-        elif name[:3]=='II_':
-            if '@' in name:
+        elif acc[:3]=='II_':
+            if '@' in acc:
                 Number_IIvar = Number_IIvar+1
             else:
                 Number_II = Number_II+1      
         else:
-            if '@' in name:
+            if '@' in acc:
                 Number_refvar = Number_refvar+1
             else:
                 Number_ref = Number_ref+1
@@ -300,7 +274,7 @@ def stat_summary(effective_threshold,DB_custom,expname,vcf_path):
     path = filename.replace('.vcf','')+'_result/'+expname+'summary.tsv'
     with open(path, 'w') as f:
         f.write('effective_threshold\taltProt (IP) \tnovel isoform (II)\trefprot\taltProt_variants (IP) \tnovel isoform_variants (II)\trefprot_variants\n')
-        f.write(effective_threshold+'\t'+Number_IP+'\t'+Number_II+'\t'+refprot+'\t'+Number_IPvar+'\t'+Number_IIvar+'\t'+Number_refvar+'\n')
+        f.write(str(effective_threshold)+'\t'+str(Number_IP)+'\t'+str(Number_II)+'\t'+str(Number_ref)+'\t'+str(Number_IPvar)+'\t'+str(Number_IIvar)+'\t'+str(Number_refvar)+'\n')
 
 def write_Fasta_DB(DB_custom,expname,vcf_path,effective_threshold):
     filename = vcf_path.split('/')[-1]
