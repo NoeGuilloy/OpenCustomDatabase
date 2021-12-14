@@ -49,7 +49,8 @@ effective_threshold	altProt (IP)	novel isoform (II)	refProt	altProt_variants (IP
 ```
 
 
-Running OpenCustomDB with Python
+Running OpenCustomDB with Python.
+
 Clone github repository https://github.com/NoeGuilloy/OpenCustomDatabase.
 
 Launch from Python as shown below :
