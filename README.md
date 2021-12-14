@@ -1,2 +1,2 @@
-# OpenCMS
+# OpenCustomDB
 Custom Mass Spectrometry library
