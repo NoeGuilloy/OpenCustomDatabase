@@ -65,7 +65,7 @@ Clone github repository https://github.com/NoeGuilloy/OpenCustomDatabase.
 **Launch from Python as shown below :**
 
 ```
-from OpenCMS.OpenCMS import OpenCMS                        #Load OpenCMS
+from OpenCustomDB.OpenCustomDB import OpenCMS                        #Load OpenCMS
 OPCMS = OpenCMS(vcf_path=vcf,                              #Vcf Path
                         expname = name,                    #experience name
                         input_kallisto=kallisto,
