@@ -69,7 +69,7 @@ from OpenCustomDB.OpenCustomDB import OpenCMS                        #Load OpenC
 OPCMS = OpenCMS(vcf_path=vcf,                              #Vcf Path
                         expname = name,                    #experience name
                         input_kallisto=kallisto,
-                   ip_iiban =None,                         #yes = non-canonical proteins are excluded, default = no 
+                   ipban =None,                         #yes = non-canonical proteins are excluded, default = no 
                    protnumber =None,                       #default = 100000
                    tpmnumber = None,                       #default = 0
                    trxexclude = None,                      #list of transcript to exclude
